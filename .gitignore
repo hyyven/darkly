@@ -5,3 +5,4 @@ launch_msf.sh
 test/
 index.php
 sqlmap/
+hashcat/
