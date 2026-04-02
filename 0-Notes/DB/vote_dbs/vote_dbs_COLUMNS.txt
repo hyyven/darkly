@@ -1,0 +1,4 @@
+id_vote
+vote
+nb_vote
+subject
