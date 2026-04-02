@@ -11,4 +11,4 @@
 - Open a browser and access `127.0.0.1:8080`
 
 ## Notes
-- recover email: `webmaster@borntosec.com`
+CHECK ROBOTS.TXT
