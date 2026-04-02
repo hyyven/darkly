@@ -1,11 +1,11 @@
 from requests import post
 
 def main():
-    url = "http://localhost:8080/index.php?page=recover"
+    url = "http://localhost:8080/index.php?page=survey"
 
     data = {
-        "mail": "any@email.haha",
-        "Submit": "Submit"
+        "sujet": "2",
+        "valeur": "15"
     }
 
     response = post(url, data=data)
