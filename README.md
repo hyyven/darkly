@@ -21,6 +21,3 @@
     
 - Boot options -> Details -> Check ONLY `SATA CDROM 1` -> Apply -> Begin Installation
 - Open a browser and access `127.0.0.1:8080`
-
-## Notes
-CHECK ROBOTS.TXT
