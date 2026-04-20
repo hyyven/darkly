@@ -1,9 +1,0 @@
-BornToSec - Web Section.html
-BornToSec - Web Section_files/
-docker-compose.yml
-launch_msf.sh
-test/
-index.php
-sqlmap/
-hashcat/
-__pycache__
